@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Register | Libra Connect</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    body {
+      background-color: #f3f6f9;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .register-card {
+      max-width: 440px;
+      width: 100%;
+      margin: auto;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.08);
+      background-color: #fff;
+      position: relative;
+    }
+
+    .tooltip-box {
+      display: none;
+      position: absolute;
+      background: #fff;
+      border: 1px solid #ccc;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      z-index: 10;
+      width: 100%;
+      top: 100%;
+      left: 0;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .tooltip-box ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+    }
+
+    .tooltip-box li::before {
+      content: '❌';
+      color: grey;
+      margin-right: 6px;
+    }
+
+    .tooltip-box li.valid::before {
+      content: '✅';
+      color: green;
+    }
+
+    .strength-bar {
+      height: 5px;
+      width: 100%;
+      background: #eee;
+      margin-top: 5px;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .strength-fill {
+      height: 100%;
+      width: 0%;
+      transition: width 0.3s;
+    }
+  </style>
+</head>
+<body class="d-flex align-items-center justify-content-center" style="min-height: 100vh">
+
+  <div class="register-card">
+    <h3 class="text-center mb-4">📝 Create Your Account</h3>
+    <form action="/auth/register" method="POST" novalidate>
+      <div class="mb-3">
+        <label for="name" class="form-label">Full Name</label>
+        <input type="text" name="name" class="form-control" id="name" required placeholder="e.g. Jane Doe" />
+      </div>
+
+      <div class="mb-3">
+        <label for="email" class="form-label">Email Address</label>
+        <input type="email" name="email" class="form-control" id="email" required placeholder="e.g. user@example.com" />
+      </div>
+
+      <div class="mb-3 position-relative">
+        <label for="password" class="form-label">Password</label>
+        <input type="password" name="password" id="password" class="form-control" autocomplete="off" required placeholder="Choose a strong password" />
+        <div class="tooltip-box mt-1" id="passwordTooltip">
+          <strong>Your password must:</strong>
+          <ul class="mt-2">
+            <li id="rule-length">Be at least 8 characters</li>
+            <li id="rule-uppercase">Include uppercase letter</li>
+            <li id="rule-lowercase">Include lowercase letter</li>
+            <li id="rule-number">Include a number</li>
+            <li id="rule-symbol">Include special character (!@#$)</li>
+            <li id="rule-notname">Not contain your name</li>
+          </ul>
+        </div>
+        <div class="strength-bar">
+          <div class="strength-fill bg-danger" id="strengthFill"></div>
+        </div>
+      </div>
+
+      <div class="d-grid mt-3">
+        <button class="btn btn-success">Register</button>
+      </div>
+    </form>
+
+    <p class="text-center mt-3 mb-0">Already have an account? <a href="/auth/login" class="text-decoration-none">Login here</a></p>
+  </div>
+
+  <script>
+    const password = document.getElementById('password');
+    const name = document.getElementById('name');
+    const tooltip = document.getElementById('passwordTooltip');
+    const strengthFill = document.getElementById('strengthFill');
+
+    const rules = {
+      length: val => val.length >= 8,
+      uppercase: val => /[A-Z]/.test(val),
+      lowercase: val => /[a-z]/.test(val),
+      number: val => /[0-9]/.test(val),
+      symbol: val => /[!@#$%^&*(),.?":{}|<>]/.test(val),
+      notname: val => name.value ? !val.toLowerCase().includes(name.value.toLowerCase()) : true
+    };
+
+    const ruleElements = {
+      length: document.getElementById('rule-length'),
+      uppercase: document.getElementById('rule-uppercase'),
+      lowercase: document.getElementById('rule-lowercase'),
+      number: document.getElementById('rule-number'),
+      symbol: document.getElementById('rule-symbol'),
+      notname: document.getElementById('rule-notname')
+    };
+
+    password.addEventListener('focus', () => tooltip.style.display = 'block');
+    password.addEventListener('blur', () => setTimeout(() => tooltip.style.display = 'none', 200));
+
+    password.addEventListener('input', () => {
+      const val = password.value;
+      let passed = 0;
+      Object.entries(rules).forEach(([key, rule]) => {
+        if (rule(val)) {
+          ruleElements[key].classList.add('valid');
+          passed++;
+        } else {
+          ruleElements[key].classList.remove('valid');
+        }
+      });
+
+      const percent = (passed / Object.keys(rules).length) * 100;
+      strengthFill.style.width = `${percent}%`;
+      strengthFill.className = 'strength-fill';
+      if (percent < 40) strengthFill.classList.add('bg-danger');
+      else if (percent < 80) strengthFill.classList.add('bg-warning');
+      else strengthFill.classList.add('bg-success');
+    });
+  </script>
+
+</body>
+</html>

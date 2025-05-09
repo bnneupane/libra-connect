@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard | Libra Connect</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    body {
+      background: #f5f7fa;
+      font-family: 'Poppins', sans-serif;
+    }
+    .stat-card {
+      border-radius: 1rem;
+      background: white;
+      padding: 20px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.05);
+      text-align: center;
+    }
+    .profile-img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+      cursor: pointer;
+    }
+    #profileDropdown {
+      z-index: 999;
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 60px;
+      width: 250px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+    #profileDropdown .dropdown-item:hover {
+      background: #f0f0f0;
+    }
+
+    .card-img-top {
+      height: 320px;
+      object-fit: contain;
+      padding: 10px;
+      background-color: #fff;
+    }
+    .book-card .card {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .book-card .card-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .book-card .btn {
+      margin-top: 3px;
+    }
+    @media (max-width: 767px) {
+      .card-img-top {
+        height: 220px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ✅ Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/books/dashboard">📚 Libra Connect</a>
+    <div class="d-flex align-items-center">
+      <!-- 🔔 Notifications -->
+      <a href="/profile/notifications" class="btn btn-light position-relative me-3">
+        🔔
+        <% const unseenCount = user.notifications.filter(n => !n.seen).length; %>
+        <% if (unseenCount > 0) { %>
+          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+            <%= unseenCount %>
+          </span>
+        <% } %>
+      </a>
+
+      <!-- 👤 Profile Dropdown -->
+      <div class="position-relative">
+        <img src="<%= user.profilePic || '/images/default-profile.png' %>" id="profileIcon" class="profile-img" alt="User profile image">
+        <div id="profileDropdown" class="p-3">
+          <div class="text-center mb-2">
+            <img src="<%= user.profilePic || '/images/default-profile.png' %>" class="rounded-circle mb-2" width="70" height="70" alt="User image">
+            <h6><%= user.name %></h6>
+            <small><%= user.email %></small>
+          </div>
+          <hr>
+          <a href="/books/borrow-history" class="dropdown-item text-primary">📄 Borrow History</a>
+          <a href="/books/bookmarks" class="dropdown-item text-primary">🔖 Bookmarked Books</a>
+          <a href="/profile" class="dropdown-item text-primary">👤 Manage Profile</a>
+          <a href="/auth/logout" class="dropdown-item text-danger">🚪 Logout</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- 📊 Welcome & Stats -->
+<div class="container mt-5">
+  <h2 class="text-center mb-4">Welcome, <%= user.name %>!</h2>
+
+  <div class="row text-center mb-5">
+    <div class="col-md-4">
+      <div class="stat-card">
+        <h5>Total Borrowed</h5>
+        <h2><%= totalBorrowed %></h2>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="stat-card">
+        <h5>Active Borrowed</h5>
+        <h2><%= activeBorrowed %></h2>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="stat-card">
+        <h5>Bookmarked</h5>
+        <h2><%= bookmarksCount %></h2>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🔍 Search Bar -->
+  <div class="row mb-4">
+    <div class="col-md-8 mx-auto">
+      <input type="text" id="searchInput" class="form-control" placeholder="Search by Title, Author or Genre...">
+    </div>
+  </div>
+
+  <!-- 📚 Book List -->
+  <div class="text-center mb-4">
+    <h4>📚 List of Available Books</h4>
+  </div>
+
+  <div class="row" id="bookList">
+    <% books.forEach(book => { %>
+      <div class="col-md-4 mb-4 book-card">
+        <div class="card shadow-sm">
+          <img src="<%= book.imageURL %>" class="card-img-top" alt="Cover of <%= book.title %>">
+          <div class="card-body">
+            <div>
+              <h5 class="card-title"><%= book.title %></h5>
+              <p><strong>Author:</strong> <%= book.author %></p>
+              <p><strong>Genre:</strong> <%= book.genre %></p>
+              <p><strong>Available:</strong> <%= book.copiesAvailable %></p>
+            </div>
+            <div>
+              <form action="/books/borrow/<%= book._id %>" method="POST" class="d-inline">
+                <button class="btn btn-success btn-sm" <% if(book.copiesAvailable <= 0){ %> disabled <% } %>>Borrow</button>
+              </form>
+              <form action="/books/return/<%= book._id %>" method="POST" class="d-inline">
+                <button class="btn btn-warning btn-sm">Return</button>
+              </form>
+              <form action="/books/bookmark/<%= book._id %>" method="POST" class="d-inline">
+                <% if (user.bookmarks.some(b => b.equals(book._id))) { %>
+                  <button class="btn btn-danger btn-sm">Unbookmark</button>
+                <% } else { %>
+                  <button class="btn btn-outline-primary btn-sm">Bookmark</button>
+                <% } %>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% }); %>
+  </div>
+</div>
+
+<!-- ✅ Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  const searchInput = document.getElementById('searchInput');
+  const bookCards = document.querySelectorAll('.book-card');
+
+  searchInput.addEventListener('input', function () {
+    const keyword = this.value.toLowerCase();
+    bookCards.forEach(card => {
+      card.style.display = card.innerText.toLowerCase().includes(keyword) ? 'block' : 'none';
+    });
+  });
+
+  const profileIcon = document.getElementById("profileIcon");
+  const dropdown = document.getElementById("profileDropdown");
+
+  profileIcon.addEventListener("click", () => {
+    dropdown.style.display = dropdown.style.display === "none" ? "block" : "none";
+  });
+
+  document.addEventListener("click", function (event) {
+    if (!dropdown.contains(event.target) && !profileIcon.contains(event.target)) {
+      dropdown.style.display = "none";
+    }
+  });
+</script>
+
+</body>
+</html>

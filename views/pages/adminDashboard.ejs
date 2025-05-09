@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard | Libra Connect</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: #eef2f7;
+      font-family: 'Poppins', sans-serif;
+    }
+    .card {
+      border-radius: 1rem;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+      transition: 0.3s;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    .profile-img {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      object-fit: cover;
+      cursor: pointer;
+    }
+    #adminDropdown {
+      position: absolute;
+      right: 10px;
+      top: 60px;
+      width: 230px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      display: none;
+      z-index: 999;
+      padding: 1rem;
+    }
+    #adminDropdown .dropdown-item {
+      cursor: pointer;
+      transition: background 0.2s ease-in-out;
+    }
+    #adminDropdown .dropdown-item:hover {
+      background: #f1f1f1;
+    }
+  </style>
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark position-relative">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">📊 Admin Panel</a>
+    <div class="d-flex align-items-center">
+      <span class="text-white me-3">Welcome, <strong><%= user.name %></strong></span>
+      <img src="<%= user.profilePic || '/images/default-profile.png' %>" class="profile-img" id="adminPic" alt="Admin profile picture" title="Click to open profile menu">
+    </div>
+  </div>
+
+  <div id="adminDropdown">
+    <div class="text-center mb-2">
+      <img src="<%= user.profilePic || '/images/default-profile.png' %>" class="rounded-circle" width="70" height="70">
+      <h6 class="mt-2 mb-0"><%= user.name %></h6>
+      <small><%= user.email %></small>
+    </div>
+    <hr>
+    <a href="/admin/profile" class="dropdown-item text-primary">👤 Manage Profile</a>
+    <a href="/admin/notifications" class="dropdown-item text-primary">📤 Send Notifications</a>
+    <a href="/admin/notifications/history" class="dropdown-item text-primary">📥 View Notifications</a>
+    <a href="/admin/books" class="dropdown-item text-primary">📚 Manage Books</a>
+    <a href="/admin/users" class="dropdown-item text-primary">👥 Manage Users</a>
+    <a href="/auth/logout" class="dropdown-item text-danger">🚪 Logout</a>
+  </div>
+</nav>
+
+<div class="container mt-5">
+  <h2 class="text-center mb-4">📈 Admin Dashboard Overview</h2>
+
+  <div class="row text-center mb-4">
+    <div class="col-md-4 mb-3">
+      <div class="card p-4">
+        <h5>Total Books</h5>
+        <h2><%= totalBooks %></h2>
+      </div>
+    </div>
+    <div class="col-md-4 mb-3">
+      <div class="card p-4">
+        <h5>Total Users</h5>
+        <h2><%= totalUsers %></h2>
+      </div>
+    </div>
+    <div class="col-md-4 mb-3">
+      <div class="card p-4">
+        <h5>Active Borrowed</h5>
+        <h2><%= activeBorrowed %></h2>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <select class="form-select w-auto" id="statusFilter">
+      <option value="all">All</option>
+      <option value="active">Active Only</option>
+      <option value="returned">Returned Only</option>
+    </select>
+    <button class="btn btn-success" onclick="exportTable()">⬇ Export CSV</button>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-bordered table-hover" id="borrowTable">
+      <thead class="table-dark">
+        <tr>
+          <th>#</th>
+          <th>User</th>
+          <th>Email</th>
+          <th>Book Title</th>
+          <th>Borrow Date</th>
+          <th>Return Date</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% let count = 1; let hasRecords = false; %>
+        <% users.forEach(user => { user.borrowedBooks.forEach(borrow => { hasRecords = true; %>
+          <tr class="<%= borrow.returnDate ? 'returned' : 'active' %>">
+            <td><%= count++ %></td>
+            <td><%= user.name %></td>
+            <td><%= user.email %></td>
+            <td><%= borrow.bookId ? borrow.bookId.title : 'Deleted Book' %></td>
+            <td><%= borrow.borrowDate.toDateString() %></td>
+            <td><%= borrow.returnDate ? borrow.returnDate.toDateString() : '-' %></td>
+            <td>
+              <% if (!borrow.returnDate) { %>
+                <span class="badge bg-warning text-dark">Active</span>
+              <% } else { %>
+                <span class="badge bg-success">Returned</span>
+              <% } %>
+            </td>
+          </tr>
+        <% }) }) %>
+        <% if (!hasRecords) { %>
+          <tr><td colspan="7" class="text-center text-muted">No borrowed records found.</td></tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  const adminPic = document.getElementById('adminPic');
+  const dropdown = document.getElementById('adminDropdown');
+  adminPic.addEventListener('click', () => {
+    dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+  });
+  document.addEventListener('click', (e) => {
+    if (!dropdown.contains(e.target) && e.target !== adminPic) dropdown.style.display = "none";
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') dropdown.style.display = "none";
+  });
+
+  const filter = document.getElementById('statusFilter');
+  const rows = document.querySelectorAll('#borrowTable tbody tr');
+  filter.addEventListener('change', () => {
+    const value = filter.value;
+    rows.forEach(row => {
+      row.style.display = (value === 'all' || row.classList.contains(value)) ? '' : 'none';
+    });
+  });
+
+  function exportTable() {
+    const rows = document.querySelectorAll("table tr");
+    let csv = [];
+    rows.forEach(row => {
+      const cols = row.querySelectorAll("td,th");
+      csv.push([...cols].map(td => `"${td.innerText}"`).join(","));
+    });
+    const blob = new Blob([csv.join("\n")], { type: "text/csv" });
+    const link = document.createElement("a");
+    link.download = "borrowed_records.csv";
+    link.href = URL.createObjectURL(blob);
+    link.click();
+  }
+</script>
+
+</body>
+</html>

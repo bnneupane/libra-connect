@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Notifications | Libra Connect</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .notification-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .notification-time {
+      font-size: 0.85rem;
+      color: #6c757d;
+      white-space: nowrap;
+    }
+    .notification-unseen {
+      font-weight: 600;
+      position: relative;
+    }
+    .notification-unseen::before {
+      content: '🔴';
+      position: relative;
+      margin-right: 6px;
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body class="bg-light">
+
+<div class="container mt-5 mb-5">
+  <h2 class="mb-4 text-center">🔔 Your Notifications</h2>
+
+  <% if (notifications.length > 0) { %>
+    <ul class="list-group shadow-sm">
+      <% notifications.forEach(n => { %>
+        <li class="list-group-item notification-item">
+          <span class="<%= !n.seen ? 'notification-unseen' : '' %>">
+            <%= n.message %>
+          </span>
+          <span class="notification-time"><%= new Date(n.date).toLocaleString() %></span>
+        </li>
+      <% }) %>
+    </ul>
+  <% } else { %>
+    <p class="text-center text-muted">No notifications yet!</p>
+  <% } %>
+
+  <div class="text-center mt-4">
+    <a href="/books/dashboard" class="btn btn-primary">⬅ Back to Dashboard</a>
+  </div>
+</div>
+
+</body>
+</html>
