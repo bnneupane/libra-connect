@@ -56,7 +56,7 @@ Visit: `http://localhost:5000`
 
 ## 💬 Contact
 
-Made with ❤️ by [Mansi Mehara](mailto:your.email@example.com)
+Made with ❤️ by [Barun Neupane](mailto:your.bnneupane2001@gmail.com)
 
 ---
 
