@@ -1,65 +1,66 @@
-# 📚 Libra Connect - Online Library Management System
+# 📚 Libra Connect
 
-Libra Connect is a full-featured online library management web app built with **Node.js**, **Express**, **MongoDB**, and **Bootstrap**.
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)
+[![Node.js](https://img.shields.io/badge/Node.js-18.x-green?logo=node.js)](https://nodejs.org/)
+[![Express](https://img.shields.io/badge/Express.js-lightgrey?logo=express)](https://expressjs.com/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-green?logo=mongodb)](https://www.mongodb.com/)
+[![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-purple?logo=bootstrap)](https://getbootstrap.com/)
+
+---
+
+## 🗂 Project Overview
+
+Libra Connect is a modern online library management system with full admin/user support.  
+Built with the MERN stack (minus React), it features user authentication, book borrowing, bookmarks, admin notifications, and real-time dashboard stats.
 
 ## ✨ Features
 
-- 📖 User authentication (register, login, password reset via email OTP)
-- 🔖 Bookmark books
+- 🧑‍💼 Admin & User Roles
 - 📚 Borrow and return books
-- 👤 Profile management with photo upload and password change
-- 📬 Admin notifications to users
-- 📊 Admin dashboard with filtering and exports
-- 🛡 Role-based access (admin vs user)
-- 🔐 Secure session and input validation
+- 🔖 Bookmark system
+- 📨 OTP password reset
+- 📊 Admin dashboard with charts/export
+- 👤 Profile picture & password change
+- 🔐 Session-secured authentication
+
+## 🚀 Quick Start
+
+```bash
+git clone https://github.com/YOUR_USERNAME/libra-connect.git
+cd libra-connect
+npm install
+```
+
+Create a `.env` file using `.env.example`, then:
+
+```bash
+npm start
+```
+
+Visit: `http://localhost:5000`
 
 ## 📁 Folder Structure
 
 ```
-controllers/        # Route logic for admin, auth, books, profile
-middlewares/        # Auth and flash middlewares
-models/             # MongoDB schemas
-routes/             # Express route definitions
-views/pages/        # EJS templates
-public/             # Static files (CSS, images, JS)
+📦libra-connect
+ ┣ 📂controllers       → Route logic (admin, auth, books, profile)
+ ┣ 📂middlewares       → Auth & flash middleware
+ ┣ 📂models            → Mongoose schemas
+ ┣ 📂routes            → Express route handling
+ ┣ 📂views/pages       → EJS frontend templates
+ ┣ 📂public            → Static files (CSS, images)
+ ┣ 📄server.js         → Entry point
+ ┣ 📄package.json
+ ┣ 📄.env.example
 ```
 
-## 🛠 Setup Instructions
+## 💬 Contact
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/YOUR_USERNAME/libra-connect.git
-   cd libra-connect
-   ```
-
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
-
-3. **Set up environment variables:**
-
-   Create a `.env` file based on the `.env.example` provided.
-
-4. **Run the app locally:**
-   ```bash
-   npm start
-   ```
-
-5. **Visit in browser:**
-   ```
-   http://localhost:5000
-   ```
-
-## 🌐 Demo
-> Add your deployed URL here (e.g., Render/Glitch/Heroku/Netlify)
+Made with ❤️ by [Mansi Mehara](mailto:your.email@example.com)
 
 ---
 
-## 👨‍💻 Tech Stack
+## 📜 License
 
-- Node.js / Express.js
-- MongoDB (with Mongoose)
-- EJS templating
-- Bootstrap 5
-- Nodemailer (for OTP emails)
+MIT License (Free to use and modify)
+
